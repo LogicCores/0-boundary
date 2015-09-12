@@ -1,5 +1,9 @@
 {
   "name": "0-boundary-for-github",
   "version": "0.0.0",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "request": "^2.61.0",
+    "uuid": "^2.0.1"
+  }
 }
