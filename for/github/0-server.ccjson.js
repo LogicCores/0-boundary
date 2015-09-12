@@ -53,7 +53,17 @@ exports.forLib = function (LIB) {
                                             if (!req.context) {
                                                 req.context = {};
                                             }
-                                            req.context[config.request.contextAlias] = context;
+                                            req.context[config.request.contextAlias] = LIB._.assign(context, {
+                                                canBypass: function () {
+                                                    if (
+                                                        req.headers["x-boundary-bypass-token"] &&
+                                                        req.headers["x-boundary-bypass-token"] === context.bypassToken
+                                                    ) {
+                                                        return true;
+                                                    }
+                                                    return false;
+                                                }
+                                            });
                                         }
 
                                         function authorize () {
