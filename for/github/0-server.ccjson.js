@@ -69,6 +69,9 @@ exports.forLib = function (LIB) {
                                         function authorize () {
 
                                             function isAuthorized () {
+                                                if (config.forceAuthorized === true) {
+                                                    return LIB.Promise.resolve(true);
+                                                } else
                                                 // If there is a matching bypass token header we will allow the request
                                                 if (
                                                     req.headers["x-boundary-bypass-token"] &&
