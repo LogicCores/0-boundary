@@ -114,7 +114,10 @@ exports.forLib = function (LIB) {
                                                         return LIB.Promise.resolve(true);
                                                     }
 
-                                                    if (req.headers["X-Request-Type"] === "background-fetch") {
+                                                    if (
+                                                        req.headers["X-Request-Type"] === "background-fetch" ||
+                                                        req.headers["X-Request-Type"] === "background-request"
+                                                    ) {
                                                         // We are being asked to deny entry instead of redirecting.
                                                         return LIB.Promise.resolve(false);
                                                     }
