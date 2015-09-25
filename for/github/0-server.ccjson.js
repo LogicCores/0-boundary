@@ -2,6 +2,8 @@
 exports.forLib = function (LIB) {
     var ccjson = this;
 
+const DEBUG = false;
+
     const UUID = require("uuid");
     const TEAM = require("./team").forLib(LIB);
 
@@ -28,9 +30,8 @@ exports.forLib = function (LIB) {
                 self.AspectInstance = function (aspectConfig) {
                     
                     return LIB.Promise.all([
-                        context.getAdapterAPI("page"),
-                        context.getAdapterAPI("auth")
-                    ]).spread(function (page, auth) {
+                        context.getAdapterAPI("page")
+                    ]).spread(function (page) {
 
                         return LIB.Promise.resolve({
                             restrictToTeam: function () {
@@ -86,15 +87,20 @@ exports.forLib = function (LIB) {
                                                         req.headers["x-boundary-bypass-token"] &&
                                                         req.headers["x-boundary-bypass-token"] === api.bypassToken
                                                     ) {
+if (DEBUG) console.log(req.url, "[boundary] Authorize: valid bypass token");                                                        
                                                         // Token matches
                                                         return LIB.Promise.resolve(true);
                                                     }
+if (DEBUG) console.log(req.url, "[boundary] req.state:", req.state);                                                        
+                                                    
                                                     if (
-                                                        auth &&
-                                                        auth.authorized === true
+                                                        req.state.auth &&
+                                                        req.state.auth.authorized === true
                                                     ) {
+if (DEBUG) console.log(req.url, "[boundary] Authorize: forced authorize");                                                        
                                                         return LIB.Promise.resolve(true);
                                                     }
+if (DEBUG) console.log(req.url, "[boundary] NO Authorize: not authorized by config/interal request");                                                        
                                                     return LIB.Promise.resolve(false);
                                                 }
                                                 
@@ -108,6 +114,7 @@ exports.forLib = function (LIB) {
                                                         !config.public ||
                                                         !page
                                                     ) {
+if (DEBUG) console.log(req.url, "[boundary] Authorize: Public page");
                                                         // Authorize by default if no authorizer configured
                                                         return LIB.Promise.resolve(true);
                                                     }
@@ -120,6 +127,7 @@ exports.forLib = function (LIB) {
                                                             ) !== -1);
                                                         }
                                                         if (isPathAllowed()) {
+if (DEBUG) console.log(req.url, "[boundary] Authorize: Public page");
                                                             return LIB.Promise.resolve(true);
                                                         }
     
@@ -127,10 +135,12 @@ exports.forLib = function (LIB) {
                                                             req.headers["X-Request-Type"] === "background-fetch" ||
                                                             req.headers["X-Request-Type"] === "background-request"
                                                         ) {
+if (DEBUG) console.log(req.url, "[boundary] NO Authorize: return 403");
                                                             // We are being asked to deny entry instead of redirecting.
                                                             return LIB.Promise.resolve(false);
                                                         }
-    
+
+if (DEBUG) console.log(req.url, "[boundary] NO Authorize: redirect");
                                                         return {
                                                             "redirectTo": pageContext.page.host.baseUrl + config.public.urls.unauthorizedRedirect
                                                         };
@@ -138,11 +148,16 @@ exports.forLib = function (LIB) {
                                                 });
                                             }
     
+    
+if (DEBUG) console.log(req.url, "[boundary] Check authorize");
+    
                                             return authorize().then(function (authorized) {
                                                 if (authorized !== true) {
                                                     if (authorized.redirectTo) {
+if (DEBUG) console.log(req.url, "[boundary] NO Authorize: ACT 302");
                                                         return res.redirect(authorized.redirectTo);
                                                     }
+if (DEBUG) console.log(req.url, "[boundary] NO Authorize: ACT 403");
                                                     res.writeHead(403);
                                                     return res.end("Forbidden");
                                                 }
