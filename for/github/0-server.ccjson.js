@@ -64,7 +64,7 @@ const DEBUG = false;
                                                     req.state = {};
                                                 }
                                                 req.state[config.request.stateAlias] = LIB._.assign(api, {
-                                                    canBypass: function () {
+                                                    hasBypassHeader: function () {
                                                         if (
                                                             req.headers["x-boundary-bypass-token"] &&
                                                             req.headers["x-boundary-bypass-token"] === api.bypassToken
