@@ -1,15 +1,12 @@
 
 exports.forLib = function (LIB) {
 
-    const URL = require("url");
-    const REQUEST = require("request");
-
     var exports = {};
 
     function callGithub(token, path) {
         return LIB.Promise.promisify(function (callback) {
             var url = "https://api.github.com" + path;
-            return REQUEST({
+            return LIB.request({
                 url: url,
                 headers: {
                     "User-Agent": "nodejs/request",
@@ -43,7 +40,7 @@ exports.forLib = function (LIB) {
 
     exports.isUserMember = function (info) {
         return LIB.Promise.try(function () {
-            var teamUrlParts = URL.parse(info.teamUrl);
+            var teamUrlParts = LIB.url.parse(info.teamUrl);
             var m = teamUrlParts.path.match(/^\/orgs\/([^\/]+)\/teams\/([^\/]+)$/);
             if (!m) {
                 throw new Error("Invalid team URL! Copy/paste the URL from github when viewing the team.");

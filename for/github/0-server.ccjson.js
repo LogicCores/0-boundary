@@ -2,9 +2,8 @@
 exports.forLib = function (LIB) {
     var ccjson = this;
 
-const DEBUG = false;
+    const DEBUG = LIB.VERBOSE;
 
-    const UUID = require("uuid");
     const TEAM = require("./team").forLib(LIB);
 
     return LIB.Promise.resolve({
@@ -22,7 +21,7 @@ const DEBUG = false;
 
                 var api = {
                     // TODO: Instead of re-using token, issue signed requests on demand
-                    bypassToken: UUID.v4()
+                    bypassToken: LIB.uuid.v4()
                 };
 
                 context.setAdapterAPI(api);
